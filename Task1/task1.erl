@@ -40,8 +40,11 @@ truck(Name) ->
 truckLoop(Name, Capacity, Load) ->
     receive
         {_, {package, Counter, Size}} ->
+            io:format("~p: Package Loaded.~n", [Name]),
             if 
                 Capacity - Size == 0 ->
+                    io:format("~p: Leaving.~n", [Name]),
+                    io:format("~p: New truck arrived.~n", [Name]),
                     truckLoop(Name, 100, []);
                 true ->
                     truckLoop(Name, Capacity - Size, Load ++ [{package, Counter, Size}])
