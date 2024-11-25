@@ -4,15 +4,22 @@
 -export([start/0, feeder/2, conveyor/2, truck/1]).
 
 start() ->
-    TruckID = spawn(?MODULE, truck, ["Truck 0"]),
-    ConveyorID = spawn(?MODULE, conveyor, ["Conveyor 0", TruckID]),
-    spawn(?MODULE, feeder, ["Fedder 0", ConveyorID]).
+    Truck0ID = spawn(?MODULE, truck, ["Truck 0"]),
+    Conveyor0ID = spawn(?MODULE, conveyor, ["Conveyor 0", Truck0ID]),
+    spawn(?MODULE, feeder, ["Fedder 0", Conveyor0ID]),
+    Truck1ID = spawn(?MODULE, truck, ["Truck 1"]),
+    Conveyor1ID = spawn(?MODULE, conveyor, ["Conveyor 1", Truck1ID]),
+    spawn(?MODULE, feeder, ["Fedder 1", Conveyor1ID]),
+    Truck2ID = spawn(?MODULE, truck, ["Truck 2"]),
+    Conveyor2ID = spawn(?MODULE, conveyor, ["Conveyor 2", Truck2ID]),
+    spawn(?MODULE, feeder, ["Fedder 2", Conveyor2ID]).
 
 feeder(Name, Conveyor) ->
     io:format("~p: Started generating packages.~n", [Name]),
     feederLoop(Name, Conveyor, 0).
 
 feederLoop(Name, Conveyor, Counter) ->
+    timer:sleep(500),
     Package = {package, Counter, 1}, % Generate package.
     io:format("~p: generated ~p~n", [Name, Package]),
     Conveyor ! {self(), Package},
@@ -23,6 +30,7 @@ conveyor(Name, Truck) ->
     beltLoop(Name, Truck, []).
 
 beltLoop(Name, Truck, []) ->
+    timer:sleep(500),
     receive
         {_, {package, Counter, Size}} ->
             Truck ! {self(), {package, Counter, Size}},
@@ -38,6 +46,7 @@ truck(Name) ->
     truckLoop(Name, TruckCapacity, []).
 
 truckLoop(Name, Capacity, Load) ->
+    timer:sleep(500),
     receive
         {_, {package, Counter, Size}} ->
             io:format("~p: Package Loaded.~n", [Name]),
