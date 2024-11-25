@@ -38,9 +38,9 @@ feederLoop(Name, Conveyor, Counter) ->
 
 conveyor(Name, Truck) ->
     io:format("~p: Started.~n", [Name]),
-    beltLoop(Name, Truck, []).
+    beltLoop(Name, Truck).
 
-beltLoop(Name, Truck, []) ->
+beltLoop(Name, Truck) ->
     receive
         {Fedder, {package, Counter, Size}} ->
             Truck ! {self(), {package, Counter, Size}},
@@ -52,8 +52,7 @@ beltLoop(Name, Truck, []) ->
                 receive
                 {resume} ->
                     io:format("~p: Resumed package generation.~n", [Name]),
-                    Fedder ! {resume},
-                    beltLoop(Name, Truck, [])
+                    Fedder ! {resume}
                 end
             after 1000 ->
                 io:format("~p: Package unloaded.~n", [Name]),
@@ -62,7 +61,7 @@ beltLoop(Name, Truck, []) ->
         after 1000 ->
             ok
     end,
-    beltLoop(Name, Truck, []).
+    beltLoop(Name, Truck).
 
 truck(Name) ->
     TruckCapacity = 100,

@@ -27,9 +27,9 @@ feederLoop(Name, Conveyor, Counter) ->
 
 conveyor(Name, Truck) ->
     io:format("~p: Started.~n", [Name]),
-    beltLoop(Name, Truck, []).
+    beltLoop(Name, Truck).
 
-beltLoop(Name, Truck, []) ->
+beltLoop(Name, Truck) ->
     timer:sleep(500),
     receive
         {_, {package, Counter, Size}} ->
@@ -38,7 +38,7 @@ beltLoop(Name, Truck, []) ->
         after 1000 ->
             ok
     end,
-    beltLoop(Name, Truck, []).
+    beltLoop(Name, Truck).
 
 truck(Name) ->
     TruckCapacity = 100,
