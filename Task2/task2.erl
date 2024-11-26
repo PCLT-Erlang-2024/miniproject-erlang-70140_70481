@@ -48,21 +48,21 @@ truck(Name) -> % Starts truck loop which receives packages and adds them to its 
     io:format("~p: Started.~n", [Name]),
     truckLoop(Name, TruckCapacity, []).
 
+truckLoop(Name, Capacity, Load) when Capacity < 0 -> % If New capacity after package is added overbooks the truck it resets holding the new package till a new truck arrives
+    {package, Counter, Size} = lists:last(Load), % Removes overbooked package
+    io:format("~p: Full! Leaving...~n", [Name]),
+    timer:sleep(rand:uniform(500)),
+    io:format("~p: New truck arrived.~n", [Name]),
+    truckLoop(Name, 100-Size, [{package, Counter, Size}]); % Recalls Loop
+
 truckLoop(Name, Capacity, Load) -> % Truck Loop
     timer:sleep(500),
     receive
         {_, {package, Counter, Size}} -> % Receives a package
             io:format("~p: Package Loaded.~n", [Name]),
             NewCapacity = Capacity - Size, % New capacity after package is added
-            if 
-                NewCapacity < 0 -> % If New capacity after package is added overbooks the truck it resets holding the new package till a new truck arrives
-                    io:format("~p: Full! Leaving...~n", [Name]),
-                    io:format("~p: New truck arrived.~n", [Name]),
-                    truckLoop(Name, 100-Size, [{package, Counter, Size}]); % Packge is imediatly added to new truck
-                true ->
-                    io:format("~p: Remaning capacity ~p.~n", [Name, NewCapacity]),
-                    truckLoop(Name, NewCapacity, Load ++ [{package, Counter, Size}]) % Updates capacity and adds package to Load.
-            end
+            io:format("~p: Remaning capacity ~p.~n", [Name, NewCapacity]),
+            truckLoop(Name, NewCapacity, Load ++ [{package, Counter, Size}]) % Updates capacity and adds package to Load.
         after 1000 -> % In case no packge is receive so it doesn't deadlock
             truckLoop(Name, Capacity, Load) % Just loops
     end.

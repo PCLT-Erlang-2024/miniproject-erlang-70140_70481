@@ -48,21 +48,19 @@ truck(Name) -> % Starts truck loop which receives packages and adds them to its 
     io:format("~p: Started.~n", [Name]),
     truckLoop(Name, TruckCapacity, []).
 
+truckLoop(Name, Capacity, _) when Capacity == 0 -> % Checks if new package fills the truck
+    io:format("~p: Full! Leaving...~n", [Name]),
+    io:format("~p: New truck arrived.~n", [Name]),
+    truckLoop(Name, 100, []); % Resets the truck capacity and load as to simulate a new arrival
+
 truckLoop(Name, Capacity, Load) -> % Truck Loop
     timer:sleep(500),
     receive
         {_, {package, Counter, Size}} -> % Receives a package
             io:format("~p: Package Loaded.~n", [Name]),
             NewCapacity = Capacity - Size, % New capacity after package is added
-            if 
-                NewCapacity == 0 -> % Checks if new package fills the truck
-                    io:format("~p: Full! Leaving...~n", [Name]),
-                    io:format("~p: New truck arrived.~n", [Name]),
-                    truckLoop(Name, 100, []); % Resets the truck capacity and load as to simulate a new arrival
-                true ->
-                    io:format("~p: Remaning capacity ~p.~n", [Name, NewCapacity]),
-                    truckLoop(Name, NewCapacity, Load ++ [{package, Counter, Size}]) % Updates capacity and adds package to Load.
-            end
+            io:format("~p: Remaning capacity ~p.~n", [Name, NewCapacity]),
+            truckLoop(Name, NewCapacity, Load ++ [{package, Counter, Size}]) % Updates capacity and adds package to Load.
         after 1000 -> % In case no packge is receive so it doesn't deadlock
             truckLoop(Name, Capacity, Load) % Just loops
     end.
