@@ -72,6 +72,7 @@ truck(Name) -> % Starts truck loop which receives packages and adds them to its 
     truckLoop(Name, TruckCapacity, []).
 
 truckLoop(Name, Capacity, Load) when Capacity < 0 -> % If New capacity after package is added overbooks the truck it resets holding the new package till a new truck arrives
+    io:format("~p: Overbook! Removing extra package...~n", [Name]),
     {Belt, {package, Counter, Size}} = lists:last(Load), % Removes overbooked package and uses PID Store to send message to Belt
     io:format("~p: Full! Leaving...~n", [Name]),
     Belt ! {pause}, % Asks belt to stop sending packages
